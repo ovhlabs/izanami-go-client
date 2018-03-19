@@ -10,6 +10,7 @@ type featureClient struct {
 	client *client
 }
 
+// New creates a new izanami client
 func New(host, clientID, secret string) *client {
 	return &client{
 		hostname:     host,
@@ -18,6 +19,7 @@ func New(host, clientID, secret string) *client {
 	}
 }
 
+// Feature creates a specific client for feature management
 func (c *client) Feature() *featureClient {
 	return &featureClient{
 		c,
