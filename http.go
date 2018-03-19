@@ -1,11 +1,14 @@
 package izanami_client
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
 
-	"fmt"
 	"github.com/facebookgo/httpcontrol"
 )
 
@@ -34,20 +37,23 @@ type Metadata struct {
 	NbPages  int `json:"nbPages"`
 }
 
-func (c *client) buildURL(path string, httpParams map[string]string) (*http.Request, error) {
+func (c *client) buildURL(path string, method string, httpParams map[string]string, body io.Reader) (*http.Request, error) {
 	url := fmt.Sprintf("%s%s", c.hostname, path)
-	req, errRequest := http.NewRequest(http.MethodGet, url, nil)
+	req, errRequest := http.NewRequest(method, url, body)
 	if errRequest != nil {
 		return nil, errRequest
 	}
 
-	// Add query params
-	q := req.URL.Query()
-	for k, v := range httpParams {
-		q.Add(k, v)
+	if httpParams != nil {
+		// Add query params
+		q := req.URL.Query()
+		for k, v := range httpParams {
+			q.Add(k, v)
+		}
+		req.URL.RawQuery = q.Encode()
 	}
-	req.URL.RawQuery = q.Encode()
 
+	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set(headerClientID, c.clientID)
 	req.Header.Set(headerClientSecret, c.clientSecret)
 
@@ -55,17 +61,52 @@ func (c *client) buildURL(path string, httpParams map[string]string) (*http.Requ
 }
 
 func (c *client) get(path string, httpParams map[string]string) ([]byte, error) {
-	req, errReq := c.buildURL(path, httpParams)
+	req, errReq := c.buildURL(path, http.MethodGet, httpParams, nil)
 	if errReq != nil {
 		return nil, errReq
 	}
+	return do(req)
+}
 
+func (c *client) post(path string, body interface{}) ([]byte, error) {
+	b, errJSON := json.Marshal(body)
+	if errJSON != nil {
+		return nil, errJSON
+	}
+	req, errReq := c.buildURL(path, http.MethodPost, nil, bytes.NewReader(b))
+	if errReq != nil {
+		return nil, errReq
+	}
+	return do(req)
+}
+
+func (c *client) put(path string, body interface{}) ([]byte, error) {
+	b, errJSON := json.Marshal(body)
+	if errJSON != nil {
+		return nil, errJSON
+	}
+	req, errReq := c.buildURL(path, http.MethodPut, nil, bytes.NewReader(b))
+	if errReq != nil {
+		return nil, errReq
+	}
+	return do(req)
+}
+
+func (c *client) delete(path string) error {
+	req, errReq := c.buildURL(path, http.MethodDelete, nil, nil)
+	if errReq != nil {
+		return errReq
+	}
+	_, errDo := do(req)
+	return errDo
+}
+
+func do(req *http.Request) ([]byte, error) {
 	res, errDo := httpClient.Do(req)
 	if errDo != nil {
 		return nil, errDo
 	}
 	defer res.Body.Close()
-
 	body, errRead := ioutil.ReadAll(res.Body)
 	if errRead != nil {
 		return nil, errRead

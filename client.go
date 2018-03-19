@@ -6,12 +6,20 @@ type client struct {
 	clientSecret string
 }
 
-var c *client
+type featureClient struct {
+	client *client
+}
 
-func New(conf Configuration) {
-	c = &client{
-		hostname:     conf.Host,
-		clientID:     conf.ClientID,
-		clientSecret: conf.ClientSecret,
+func New(host, clientID, secret string) *client {
+	return &client{
+		hostname:     host,
+		clientID:     clientID,
+		clientSecret: secret,
+	}
+}
+
+func (c *client) Feature() *featureClient {
+	return &featureClient{
+		c,
 	}
 }
