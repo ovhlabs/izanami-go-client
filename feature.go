@@ -51,7 +51,7 @@ func (c *FeatureClient) List(page int, pageSize int) (FeaturesResponse, error) {
 func (c *FeatureClient) ListAll() ([]FeatureModel, error) {
 	features := []FeatureModel{}
 
-	currentPage := 0
+	currentPage := 1
 	pageSize := 20
 
 	for {
@@ -60,10 +60,10 @@ func (c *FeatureClient) ListAll() ([]FeatureModel, error) {
 			return features, err
 		}
 		features = append(features, res.Results...)
-		if res.Metadata.Page == res.Metadata.PageSize {
+		if res.Metadata.Page == res.Metadata.NbPages {
 			break
 		}
-
+		currentPage++
 	}
 	return features, nil
 }

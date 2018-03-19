@@ -26,7 +26,7 @@ type Metadata struct {
 }
 
 func (c *Client) buildURL(path string, method string, httpParams map[string]string, body io.Reader) (*http.Request, error) {
-	url := fmt.Sprintf("%s%s", c.hostname, path)
+	url := fmt.Sprintf("%s%s", c.apiURL, path)
 	req, errRequest := http.NewRequest(method, url, body)
 	if errRequest != nil {
 		return nil, errRequest

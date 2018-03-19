@@ -6,8 +6,11 @@ Go client for [izanami](https://github.com/maif/izanami)
 
 ### Usage
 
-```
-c := New("host", "clientID", "clientSecret")
+```go
+c, errNew := New("host", "clientID", "clientSecret")
+if errNew != nil {
+	return errNew
+}
 	
 // List all features
 features, errF := c.Feature().ListAll()

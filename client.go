@@ -9,7 +9,7 @@ import (
 
 // Client represents the izanami client
 type Client struct {
-	hostname     string
+	apiURL       string
 	clientID     string
 	clientSecret string
 	HttpClient   *http.Client
@@ -20,10 +20,15 @@ type FeatureClient struct {
 	client *Client
 }
 
+// SwaggerClient represents a client for swagger endpoints
+type SwaggerClient struct {
+	client *Client
+}
+
 // New creates a new izanami client
-func New(host, clientID, secret string) *Client {
-	return &Client{
-		hostname:     host,
+func New(apiURL, clientID, secret string) (*Client, error) {
+	client := &Client{
+		apiURL:       apiURL,
 		clientID:     clientID,
 		clientSecret: secret,
 		HttpClient: &http.Client{
@@ -33,11 +38,20 @@ func New(host, clientID, secret string) *Client {
 			},
 		},
 	}
+	_, err := client.Swagger().Get()
+	return client, err
 }
 
 // Feature creates a specific client for feature management
 func (c *Client) Feature() *FeatureClient {
 	return &FeatureClient{
+		c,
+	}
+}
+
+// Swagger creates a specific client for getting swagger.json
+func (c *Client) Swagger() *SwaggerClient {
+	return &SwaggerClient{
 		c,
 	}
 }
