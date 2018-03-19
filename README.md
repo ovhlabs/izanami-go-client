@@ -10,7 +10,7 @@ Go client for [izanami](https://github.com/maif/izanami)
 c := New("host", "clientID", "clientSecret")
 	
 // List all features
-features, errF := c.Feature().listAll()
+features, errF := c.Feature().ListAll()
 if errF != nil {
 	return errF
 }
@@ -21,23 +21,23 @@ f := FeatureModel{
 	Enabled: true,
 	Strategy: NoStrategy,
 }
-if err := c.Feature().create(f); err != nil {
+if err := c.Feature().Create(f); err != nil {
 	return err
 }
 
 // Get a feature
-myFeature, errF := c.Feature().get(f.ID)
+myFeature, errF := c.Feature().Get(f.ID)
 if errF != nil {
 	return errF
 }
 
 // Update a feature
-if err := c.Feature().update(myFeature); err != nil {
+if err := c.Feature().Update(myFeature); err != nil {
 	return err
 }
 
 // Delete a feature
-if err := c.Feature().delete(myFeature.ID); err != nil {
+if err := c.Feature().Delete(myFeature.ID); err != nil {
 	return err
 }
 ```

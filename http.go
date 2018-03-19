@@ -7,9 +7,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"time"
-
-	"github.com/facebookgo/httpcontrol"
 )
 
 const (
@@ -18,15 +15,6 @@ const (
 
 	headerClientID     = "Izanami-Client-Id"
 	headerClientSecret = "Izanami-Client-Secret"
-)
-
-var (
-	httpClient = &http.Client{
-		Transport: &httpcontrol.Transport{
-			RequestTimeout: time.Second * 30,
-			MaxTries:       5,
-		},
-	}
 )
 
 // Metadata represents metadata parts of http response
@@ -43,7 +31,6 @@ func (c *Client) buildURL(path string, method string, httpParams map[string]stri
 	if errRequest != nil {
 		return nil, errRequest
 	}
-
 	if httpParams != nil {
 		// Add query params
 		q := req.URL.Query()
@@ -65,7 +52,7 @@ func (c *Client) get(path string, httpParams map[string]string) ([]byte, error) 
 	if errReq != nil {
 		return nil, errReq
 	}
-	return do(req)
+	return c.do(req)
 }
 
 func (c *Client) post(path string, body interface{}) ([]byte, error) {
@@ -77,7 +64,7 @@ func (c *Client) post(path string, body interface{}) ([]byte, error) {
 	if errReq != nil {
 		return nil, errReq
 	}
-	return do(req)
+	return c.do(req)
 }
 
 func (c *Client) put(path string, body interface{}) ([]byte, error) {
@@ -89,7 +76,7 @@ func (c *Client) put(path string, body interface{}) ([]byte, error) {
 	if errReq != nil {
 		return nil, errReq
 	}
-	return do(req)
+	return c.do(req)
 }
 
 func (c *Client) delete(path string) error {
@@ -97,12 +84,12 @@ func (c *Client) delete(path string) error {
 	if errReq != nil {
 		return errReq
 	}
-	_, errDo := do(req)
+	_, errDo := c.do(req)
 	return errDo
 }
 
-func do(req *http.Request) ([]byte, error) {
-	res, errDo := httpClient.Do(req)
+func (c *Client) do(req *http.Request) ([]byte, error) {
+	res, errDo := c.HttpClient.Do(req)
 	if errDo != nil {
 		return nil, errDo
 	}
