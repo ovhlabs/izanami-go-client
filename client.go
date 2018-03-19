@@ -1,18 +1,18 @@
-package izanami_client
+package client
 
-type client struct {
+type Client struct {
 	hostname     string
 	clientID     string
 	clientSecret string
 }
 
-type featureClient struct {
-	client *client
+type FeatureClient struct {
+	client *Client
 }
 
 // New creates a new izanami client
-func New(host, clientID, secret string) *client {
-	return &client{
+func New(host, clientID, secret string) *Client {
+	return &Client{
 		hostname:     host,
 		clientID:     clientID,
 		clientSecret: secret,
@@ -20,8 +20,8 @@ func New(host, clientID, secret string) *client {
 }
 
 // Feature creates a specific client for feature management
-func (c *client) Feature() *featureClient {
-	return &featureClient{
+func (c *Client) Feature() *FeatureClient {
+	return &FeatureClient{
 		c,
 	}
 }

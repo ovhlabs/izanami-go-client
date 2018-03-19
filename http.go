@@ -1,4 +1,4 @@
-package izanami_client
+package client
 
 import (
 	"bytes"
@@ -37,7 +37,7 @@ type Metadata struct {
 	NbPages  int `json:"nbPages"`
 }
 
-func (c *client) buildURL(path string, method string, httpParams map[string]string, body io.Reader) (*http.Request, error) {
+func (c *Client) buildURL(path string, method string, httpParams map[string]string, body io.Reader) (*http.Request, error) {
 	url := fmt.Sprintf("%s%s", c.hostname, path)
 	req, errRequest := http.NewRequest(method, url, body)
 	if errRequest != nil {
@@ -60,7 +60,7 @@ func (c *client) buildURL(path string, method string, httpParams map[string]stri
 	return req, nil
 }
 
-func (c *client) get(path string, httpParams map[string]string) ([]byte, error) {
+func (c *Client) get(path string, httpParams map[string]string) ([]byte, error) {
 	req, errReq := c.buildURL(path, http.MethodGet, httpParams, nil)
 	if errReq != nil {
 		return nil, errReq
@@ -68,7 +68,7 @@ func (c *client) get(path string, httpParams map[string]string) ([]byte, error) 
 	return do(req)
 }
 
-func (c *client) post(path string, body interface{}) ([]byte, error) {
+func (c *Client) post(path string, body interface{}) ([]byte, error) {
 	b, errJSON := json.Marshal(body)
 	if errJSON != nil {
 		return nil, errJSON
@@ -80,7 +80,7 @@ func (c *client) post(path string, body interface{}) ([]byte, error) {
 	return do(req)
 }
 
-func (c *client) put(path string, body interface{}) ([]byte, error) {
+func (c *Client) put(path string, body interface{}) ([]byte, error) {
 	b, errJSON := json.Marshal(body)
 	if errJSON != nil {
 		return nil, errJSON
@@ -92,7 +92,7 @@ func (c *client) put(path string, body interface{}) ([]byte, error) {
 	return do(req)
 }
 
-func (c *client) delete(path string) error {
+func (c *Client) delete(path string) error {
 	req, errReq := c.buildURL(path, http.MethodDelete, nil, nil)
 	if errReq != nil {
 		return errReq
