@@ -30,7 +30,6 @@ const (
 	GlobalScript ActivationStrategy = "GLOBAL_SCRIPT"
 )
 
-// List features on the given page.
 func (c *FeatureClient) List(page int, pageSize int) (FeaturesResponse, error) {
 	var features FeaturesResponse
 
@@ -49,7 +48,6 @@ func (c *FeatureClient) List(page int, pageSize int) (FeaturesResponse, error) {
 	return features, nil
 }
 
-// ListAll browses all pages and returns all features
 func (c *FeatureClient) ListAll() ([]FeatureModel, error) {
 	features := []FeatureModel{}
 
@@ -70,7 +68,6 @@ func (c *FeatureClient) ListAll() ([]FeatureModel, error) {
 	return features, nil
 }
 
-// Create a new feature
 func (c *FeatureClient) Create(feat FeatureModel) error {
 	_, errPost := c.client.post("/features", feat)
 	if errPost != nil {
@@ -79,7 +76,6 @@ func (c *FeatureClient) Create(feat FeatureModel) error {
 	return nil
 }
 
-// Get a feature by its id
 func (c *FeatureClient) Get(id string) (FeatureModel, error) {
 	var feature FeatureModel
 	body, errGet := c.client.get(fmt.Sprintf("/features/%s", id), nil)
@@ -92,7 +88,6 @@ func (c *FeatureClient) Get(id string) (FeatureModel, error) {
 	return feature, nil
 }
 
-// Update the given feature
 func (c *FeatureClient) Update(feat FeatureModel) error {
 	_, errPut := c.client.put(fmt.Sprintf("/features/%s", feat.ID), feat)
 	if errPut != nil {
@@ -101,7 +96,6 @@ func (c *FeatureClient) Update(feat FeatureModel) error {
 	return nil
 }
 
-// Delete a feature by its id
 func (c *FeatureClient) Delete(id string) error {
 	return c.client.delete(fmt.Sprintf("/features/%s", id))
 }
