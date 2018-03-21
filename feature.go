@@ -6,10 +6,15 @@ import (
 	"strconv"
 )
 
-// FeaturesResponse represent the http response for listAll
+// FeaturesResponse represents the http response for listAll
 type FeaturesResponse struct {
 	Results  []FeatureModel `json:"results"`
 	Metadata Metadata       `json:"metadata"`
+}
+
+// FeatureCheckResponse represents the hhtp response for a feature check
+type FeatureCheckResponse struct {
+	Active bool `json:"active"`
 }
 
 // Feature represents a feature in izanami point of view
@@ -62,7 +67,7 @@ func (c *FeatureClient) ListAll() ([]FeatureModel, error) {
 			return features, err
 		}
 		features = append(features, res.Results...)
-		if res.Metadata.Page == res.Metadata.NbPages {
+		if res.Metadata.Page >= res.Metadata.NbPages {
 			break
 		}
 		currentPage++
@@ -104,4 +109,26 @@ func (c *FeatureClient) Update(feat FeatureModel) error {
 // Delete a feature by its id
 func (c *FeatureClient) Delete(id string) error {
 	return c.client.delete(fmt.Sprintf("/features/%s", id))
+}
+
+// CheckWithoutContext if a feature is enable
+func (c *FeatureClient) CheckWithoutContext(id string) (FeatureCheckResponse, error) {
+	var checkResp FeatureCheckResponse
+	body, errB := c.client.get(fmt.Sprintf("/features/%s/check", id), nil)
+	if errB != nil {
+		return checkResp, errB
+	}
+	err := json.Unmarshal(body, &checkResp)
+	return checkResp, err
+}
+
+// CheckWithContext if a feature is enable for the given context
+func (c *FeatureClient) CheckWithContext(id string, context interface{}) (FeatureCheckResponse, error) {
+	var checkResp FeatureCheckResponse
+	body, errB := c.client.post(fmt.Sprintf("/features/%s/check", id), context)
+	if errB != nil {
+		return checkResp, errB
+	}
+	err := json.Unmarshal(body, &checkResp)
+	return checkResp, err
 }

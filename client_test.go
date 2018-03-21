@@ -7,7 +7,7 @@ import (
 )
 
 func TestFeature(t *testing.T) {
-	c, err := New("http://localhost:9090/api", "yourclientid", "yoursecret")
+	c, err := New("http://localhost:8080/api", "yourclientid", "yoursecret")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -23,6 +23,10 @@ func TestFeature(t *testing.T) {
 	t.Log("Updating a feature")
 	feat.Enabled = true
 	assert.NoError(t, c.Feature().Update(feat))
+
+	check, err := c.Feature().CheckWithoutContext(feat.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, check.Active, true)
 
 	t.Log("Getting a feature")
 	f, errF := c.Feature().Get(feat.ID)

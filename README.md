@@ -39,6 +39,12 @@ if err := c.Feature().Update(myFeature); err != nil {
 	return err
 }
 
+// Check a feature
+check, err := c.Feature().CheckWithoutContext(feat.ID)
+if err != nil {
+	return err
+}
+
 // Delete a feature
 if err := c.Feature().Delete(myFeature.ID); err != nil {
 	return err
